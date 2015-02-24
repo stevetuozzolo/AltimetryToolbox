@@ -1,6 +1,6 @@
-function [VS] = ReadPotentialVirtualStations
+function [VS] = ReadPotentialVirtualStations(fname)
 
-[~,~,DataAndHeader]=xlsread('VirtualStations.xlsx');
+[~,~,DataAndHeader]=xlsread(fname);
 
 Nsta=size(DataAndHeader,1)-1; % first row is header
 Ncol=size(DataAndHeader,2);
