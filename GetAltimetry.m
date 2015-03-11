@@ -1,4 +1,4 @@
-function Altimetry = GetAltimetry(VS)
+function Altimetry = GetAltimetry(VS,Ncyc)
     
 %2.1) Read in height & sigma0 data
 fname=['AltimetryOutputData/' VS.ID ];
@@ -20,5 +20,15 @@ Altimetry.tAll=tMJD+offdate;
 %2.2) Process heights cycle & time info
 [Altimetry.ci,i]=unique(Altimetry.c);
 Altimetry.t=Altimetry.tAll(i);
+
+Altimetry.cmax = Ncyc;
+Altimetry.call=1:Altimetry.cmax;
+Altimetry.GDRMissing=false(size(Altimetry.call)); %initiate
+
+for i=1:length(Altimetry.call),
+    if ~any(Altimetry.ci==Altimetry.call(i)),
+        Altimetry.GDRMissing(i)=true;
+    end
+end
 
 return

@@ -1,4 +1,10 @@
-function Altimetry = CalcAvgHeights(Altimetry)
+function Altimetry = CalcAvgHeights(Altimetry,ID,varargin)
+
+if nargin>1,
+    ShowPlots=varargin{1};
+else
+    ShowPlots=false;
+end
 
 Altimetry.nNODATA=0;
 Altimetry.NDcyc=[];
@@ -28,13 +34,13 @@ for j=1:length(Altimetry.ci),
         Altimetry.sig0Avg(j)=ERRORCODE;
         Altimetry.pkAvg(j)=ERRORCODE;
     else
-        hc=Altimetry.h(ic);    
-        sc=Altimetry.sig0(ic);
-        pk=Altimetry.PK(ic);
+        hc=Altimetry.h(icg);    
+        sc=Altimetry.sig0(icg);
+        pk=Altimetry.PK(icg);
 
         Altimetry.hbar(j)=mean(hc);
         Altimetry.hstd(j)=std(hc);    
-        Altimetry.N(j)=sum(ic);        
+        Altimetry.N(j)=sum(icg);        
 
         Altimetry.hwbar(j)=sum(hc.*10.^(.1.*sc))./sum(10.^(.1.*sc));
 
@@ -42,4 +48,25 @@ for j=1:length(Altimetry.ci),
 
         Altimetry.pkAvg(j)=mean(pk);        
     end    
+end
+
+
+Altimetry.nGood=sum(Altimetry.hbar~=-9999 & Altimetry.hbar~=-9998);
+
+if ShowPlots,
+    figure
+    hplotAvg=Altimetry.hbar;
+    hplotAvg(Altimetry.hbar==-9998 | Altimetry.hbar==-9999)=NaN;
+    plot(Altimetry.t,hplotAvg,'o-'); hold on;
+    hplotWavg=Altimetry.hwbar;
+    hplotWavg(Altimetry.hwbar==-9998 | Altimetry.hwbar==-9999)=NaN;
+    plot(Altimetry.t,hplotWavg,'x-'); hold off;
+    
+    set(gca,'FontSize',14)
+    datetick
+    line1=['Station #' strrep(ID,'_','-')];
+    line2=['Produced ' num2str(Altimetry.nGood) '/' num2str(Altimetry.cmax)];
+    title({line1,line2})
+    
+    legend('Average','\sigma_0 Weighted Average','Location','Best')
 end
