@@ -1,9 +1,12 @@
 function Altimetry = GetAltimetry(VS,Ncyc)
     
 %2.1) Read in height & sigma0 data
-fname=['AltimetryOutputData/' VS.ID ];
-
-datah=load(fname);
+fname=[VS.ID '_20hz' ];
+delimiterIn = ' ';
+fid=fopen(fname);
+datah = textscan(fid,'%f %f %f %f %f %f %f','headerlines',1,'CollectOutput',true);
+fclose(fid);
+datah=cell2mat(datah);
 Altimetry.c=datah(:,1);
 Altimetry.h=datah(:,2);
 
