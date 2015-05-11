@@ -1,0 +1,51 @@
+%% read all data in files....
+
+
+filenum=29 %constant... lazy
+
+for i=1:filenum
+g=i-1;
+file = ['Yukon_Jason2_' num2str(g) '.nc'];
+finfo= ncinfo(file);
+
+Global(i).lat=ncread(file,'lat');
+Global(i).lon=ncread(file,'lon');
+Global(i).ID=ncread(file,'ID');
+Global(i).sat=ncread(file,'sat');
+Global(i).pass=ncread(file,'pass');
+
+Timeseries(i).time=ncread(file,'/Timeseries/time');
+Timeseries(i).cycle=ncread(file,'/Timeseries/cycle');
+Timeseries(i).hbar=ncread(file,'/Timeseries/hbar');
+Timeseries(i).hwbar=ncread(file,'/Timeseries/hwbar');
+Timeseries(i).sig0bar=ncread(file,'/Timeseries/sig0bar');
+Timeseries(i).pkbar=ncread(file,'/Timeseries/pkbar');
+
+% Sampling.scene
+% Sampling.lonbox
+% Sampling.latbox
+% Sampling.island
+
+Level3(i).lon=ncread(file,'/Level3/lon');
+Level3(i).lat=ncread(file,'/Level3/lat');
+Level3(i).h=ncread(file,'/Level3/h');
+Level3(i).sig0=ncread(file,'/Level3/sig0');
+Level3(i).pk=ncread(file,'/Level3/pk');
+Level3(i).cycle=ncread(file,'/Level3/cycle');
+Level3(i).time=ncread(file,'/Level3/time');
+Level3(i).heightfilter=ncread(file,'/Level3/heightfilter');
+Level3(i).icefilter=ncread(file,'/Level3/icefilter');
+Level3(i).allfilter=ncread(file,'/Level3/allfilter');
+
+Filter(i).nNODATA=ncread(file,'Filter/nNODATA');
+Filter(i).riverh=ncread(file,'Filter/riverh');
+Filter(i).maxh=ncread(file,'Filter/maxh');
+Filter(i).minh=ncread(file,'Filter/minh');
+Filter(i).icethaw=ncread(file,'Filter/icethaw');
+Filter(i).icefreeze=ncread(file,'Filter/icefreeze');
+end
+
+Global
+Timeseries
+Level3
+Filter
