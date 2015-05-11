@@ -4,8 +4,9 @@
 %
 % by Steve T, Feb 2015
 % rev Mike D, Mar 2015
+% rev Steve T, May 2015
 
-function [Altimetry] = HeightFilter(Altimetry,FilterData,varargin)
+function [Altimetry] = HeightFilter(Altimetry,FilterData,IceData,varargin)
 
 if nargin>2
     DoPlots=varargin{1};
@@ -16,10 +17,19 @@ else
     DoPlots=false;
 end
 
-Altimetry.iGood=Altimetry.h <=FilterData.AbsHeight+FilterData.MaxFlood & Altimetry.h >= ...
+Altimetry.iGoodH=Altimetry.h <=FilterData.AbsHeight+FilterData.MaxFlood & Altimetry.h >= ...
     FilterData.AbsHeight-FilterData.MinFlood; 
 
-Altimetry.fFilter=sum(~Altimetry.iGood)/length(Altimetry.tAll);
+
+iH2=Altimetry.h>=prctile(Altimetry.h(Altimetry.iGoodH),10)-2; %filter relative to baseflow (>-2m 10th %tile flow -2m)
+
+Altimetry.iGoodH=Altimetry.iGoodH&iH2; %combine height filters
+
+Altimetry.fFilter=(sum(Altimetry.iGoodH))/length(Altimetry.h); %determine fraction of retrieved data filtered out
+
+Altimetry=IceFilter(Altimetry,IceData);
+Altimetry.iGood=Altimetry.iGoodH&Altimetry.IceFlag;
+Altimetry.iFilter=sum(~Altimetry.iGood)/length(Altimetry.h);
 
 if DoPlots    
     figure;
@@ -31,13 +41,15 @@ if DoPlots
         hold off;   
         legend('Filtered','All','Location','best');
     end
+    ylim([FilterData.AbsHeight-25 FilterData.AbsHeight+25])
     datetick
-    ylabel('elevation, m');    
-    line1=['Station #' num2str(FilterData.ID)];
+    ylabel('elevation, m');
+    line1=['Station #' num2str(FilterData.ID) 'new polygon'];
     fMiss=sum(Altimetry.GDRMissing)/length(Altimetry.GDRMissing);
     line2=[num2str(fMiss*100,'%.1f') '% missing from the GDR'];
-    line3=[ num2str(Altimetry.fFilter*100,'%.1f') '% thrown out.' ];    
-    title({line1,line2,line3})
+    line3=[num2str(Altimetry.fFilter*100,'%.1f') '% thrown out by height filter.' ];
+    line4=[num2str(Altimetry.iFilter*100,'%.1f') '% thrown out by height + ice filter.' ];
+    title({line1,line2,line3,line4})
     
 end
 
