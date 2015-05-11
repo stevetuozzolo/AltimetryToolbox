@@ -4,11 +4,12 @@
 
 clear all; close all
 % uselib('altimetry')
-addpath '/Users/MTD/Library/Matlab/Altimetry/AltimetryToolbox'  %this is the path to the toolbox
+folderpath='/Users/MTD/Library/Matlab/Altimetry/AltimetryToolbox';  %this is the path to the toolbox
 
-VS = ReadPotentialVirtualStations('VirtualStations.xlsx');
-S=shaperead('GIS/yukon crossings.shp');
+addpath(genpath(folderpath)); %this is the path to the toolbox + data
+[VS S] = ReadPotentialVirtualStations('Yukon_Jason2');
 FilterData = ReadFilterFile('yukonheights.txt');
+IceData= ReadIceFile('icebreak_pilot');
 
 Ncyc=219; %not sure best way to set this; maybe manually
 
@@ -25,7 +26,7 @@ end
 DoPlotsFilt=false; ShowBad=true; DoPlotsAvg=true;
 for i=1:length(VS),
     VS(i).AltDat = GetAltimetry(VS(i),Ncyc); 
-    VS(i).AltDat = HeightFilter(VS(i).AltDat,FilterData(i),DoPlotsFilt,ShowBad);
+    VS(i).AltDat = HeightFilter(VS(i).AltDat,FilterData(VS(i).Id+1),IceData,DoPlotsFilt,ShowBad);
     VS(i).AltDat = CalcAvgHeights(VS(i).AltDat,VS(i).ID,DoPlotsAvg);
     WriteAltimetryData(VS(i),FilterData(i));
 end
