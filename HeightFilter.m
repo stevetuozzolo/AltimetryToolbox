@@ -6,7 +6,7 @@
 % rev Mike D, Mar 2015
 % rev Steve T, May 2015
 
-function [Altimetry] = HeightFilter(Altimetry,FilterData,IceData,varargin)
+function [Altimetry] = HeightFilter(Altimetry,FilterData,IceData,DoIce,varargin)
 
 if nargin>2
     DoPlots=varargin{1};
@@ -21,14 +21,18 @@ Altimetry.iGoodH=Altimetry.h <=FilterData.AbsHeight+FilterData.MaxFlood & Altime
     FilterData.AbsHeight-FilterData.MinFlood; 
 
 
-iH2=Altimetry.h>=prctile(Altimetry.h(Altimetry.iGoodH),10)-2; %filter relative to baseflow (>-2m 10th %tile flow -2m)
-
+iH2=Altimetry.h>=prctile(Altimetry.h(Altimetry.iGoodH),5)-2; %filter relative to baseflow (>-2m 5th %tile flow)
 Altimetry.iGoodH=Altimetry.iGoodH&iH2; %combine height filters
-
-Altimetry.fFilter=(sum(Altimetry.iGoodH))/length(Altimetry.h); %determine fraction of retrieved data filtered out
+Altimetry.fFilter=(sum(~Altimetry.iGoodH))/length(Altimetry.h); %determine fraction of retrieved data filtered out
 
 Altimetry=IceFilter(Altimetry,IceData);
-Altimetry.iGood=Altimetry.iGoodH&Altimetry.IceFlag;
+
+if DoIce,
+    Altimetry.iGood=Altimetry.iGoodH&Altimetry.IceFlag;
+else
+    Altimetry.iGood=Altimetry.iGoodH;
+end
+
 Altimetry.iFilter=sum(~Altimetry.iGood)/length(Altimetry.h);
 
 if DoPlots    
