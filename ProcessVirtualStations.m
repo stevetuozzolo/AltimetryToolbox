@@ -10,7 +10,7 @@ addpath(genpath(folderpath)); %this is the path to the toolbox + data
 [VS S] = ReadPotentialVirtualStations('Yukon_Jason2');
 FilterData = ReadFilterFile('yukonheights.txt');
 IceData= ReadIceFile('icebreak_pilot');
-
+USGS=USGSread('Pil_Sta.txt');
 Ncyc=219; %not sure best way to set this; maybe manually
 
 %this part should eventually get included in the shapefile, and we'll do
@@ -23,12 +23,18 @@ for i=1:length(VS),
 end
 
 % for i=1:length(VS),
-DoPlotsFilt=false; ShowBad=true; DoPlotsAvg=true;
+DoPlotsFilt=false; ShowBad=true; DoPlotsAvg=true; DoIce=true;
 for i=1:length(VS),
     VS(i).AltDat = GetAltimetry(VS(i),Ncyc); 
-    VS(i).AltDat = HeightFilter(VS(i).AltDat,FilterData(VS(i).Id+1),IceData,DoPlotsFilt,ShowBad);
+    VS(i).AltDat = HeightFilter(VS(i).AltDat,FilterData(VS(i).Id+1),IceData,DoIce,DoPlotsFilt,ShowBad);
     VS(i).AltDat = CalcAvgHeights(VS(i).AltDat,VS(i).ID,DoPlotsAvg);
     WriteAltimetryData(VS(i),FilterData(i));
 end
 
+sta=6;
+USGS=USGS_Compare(VS(sta).ID,VS(sta).AltDat,USGS);
+USGSwrite(USGS,VS(sta).ID);
+
+
 ncdisp('DataProduct/yukon_J2_0.nc') %example
+ncdisp('USGS.nc'); %other example
