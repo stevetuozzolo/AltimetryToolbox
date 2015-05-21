@@ -49,3 +49,15 @@ Global
 Timeseries
 Level3
 Filter
+
+%% usgs data
+file2 = ['USGS.nc'];
+Ufinfo= ncinfo(file2);
+title=Ufinfo.Attributes.Value
+USGS.datum=ncread(file2,'datum');
+USGS.rmse=ncread(file2,'rmse');
+USGS.bias=ncread(file2,'bias');
+USGS.SD=ncread(file2,'SD');
+USGS.height=ncread(file2,'height');
+USGS.time=ncread(file2,'time');
+
