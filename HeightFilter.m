@@ -6,7 +6,7 @@
 % rev Mike D, Mar 2015
 % rev Steve T, May 2015
 
-function [Altimetry] = HeightFilter(Altimetry,FilterData,IceData,DoIce,varargin)
+function [Altimetry] = HeightFilter(Altimetry,FilterData,IceData,DoIce,ID,varargin)
 
 if nargin>2
     DoPlots=varargin{1};
@@ -16,25 +16,28 @@ if nargin>2
 else
     DoPlots=false;
 end
-
-Altimetry.iGoodH=Altimetry.h <=FilterData.AbsHeight+FilterData.MaxFlood & Altimetry.h >= ...
-    FilterData.AbsHeight-FilterData.MinFlood; 
-
+%% use absolute height data and an arbitary max flood value to
+Altimetry.iGoodH=Altimetry.h>=FilterData.AbsHeight-FilterData.MinFlood &...
+    Altimetry.h<=FilterData.AbsHeight+FilterData.MaxFlood; %filter relative to absolute river height (+15m, -10m)
 
 iH2=Altimetry.h>=prctile(Altimetry.h(Altimetry.iGoodH),5)-2; %filter relative to baseflow (>-2m 5th %tile flow)
+
 Altimetry.iGoodH=Altimetry.iGoodH&iH2; %combine height filters
+
 Altimetry.fFilter=(sum(~Altimetry.iGoodH))/length(Altimetry.h); %determine fraction of retrieved data filtered out
 
-Altimetry=IceFilter(Altimetry,IceData);
-
-if DoIce,
-    Altimetry.iGood=Altimetry.iGoodH&Altimetry.IceFlag;
+%% 
+if DoIce & sum(Altimetry.iGoodH)/((max(Altimetry.tAll)-min(Altimetry.tAll))/365)>=5,
+    Altimetry=IceFilter(Altimetry,IceData);
+    %Altimetry.iGood=Altimetry.iGoodH&Altimetry.IceFlag;
 else
     Altimetry.iGood=Altimetry.iGoodH;
+    Altimetry.IceFlag=ones(length(Altimetry.h),1);
 end
-
-Altimetry.iFilter=sum(~Altimetry.iGood)/length(Altimetry.h);
-
+    
+    Altimetry.iFilter=sum(~Altimetry.iGood)/length(Altimetry.h);
+    
+%%     
 if DoPlots    
     figure;
     plot(Altimetry.tAll(Altimetry.iGood),Altimetry.h(Altimetry.iGood),'o');
@@ -46,15 +49,18 @@ if DoPlots
         legend('Filtered','All','Location','best');
     end
     ylim([FilterData.AbsHeight-25 FilterData.AbsHeight+25])
-    datetick
-    ylabel('elevation, m');
-    line1=['Station #' num2str(FilterData.ID) 'new polygon'];
-    fMiss=sum(Altimetry.GDRMissing)/length(Altimetry.GDRMissing);
-    line2=[num2str(fMiss*100,'%.1f') '% missing from the GDR'];
-    line3=[num2str(Altimetry.fFilter*100,'%.1f') '% thrown out by height filter.' ];
-    line4=[num2str(Altimetry.iFilter*100,'%.1f') '% thrown out by height + ice filter.' ];
-    title({line1,line2,line3,line4})
-    
+          datetick
+        ylabel('elevation, m');
+        line1=['Station ' ID];
+        fMiss=sum(Altimetry.GDRMissing)/length(Altimetry.GDRMissing);
+        line2=[num2str(fMiss*100,'%.1f') '% missing from the GDR'];
+        line3=[num2str(Altimetry.fFilter*100,'%.1f') '% thrown out by height filter.' ];
+        if DoIce
+            line4=[num2str(Altimetry.iFilter*100,'%.1f') '% thrown out by height + ice filter.' ];
+            title({line1,line2,line3,line4}, 'Interpreter', 'none');
+        else
+            title({line1,line2,line3}, 'Interpreter', 'none');
+        end
 end
 
 return

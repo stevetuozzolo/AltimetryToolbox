@@ -10,6 +10,14 @@ Altimetry.nNODATA=0;
 Altimetry.NDcyc=[];
 Altimetry.NDflag=[];
 
+if sum(Altimetry.GDRMissing)==length(Altimetry.GDRMissing)
+    
+    Altimetry.hbar=0;Altimetry.hstd=0;Altimetry.N=0;Altimetry.hwbar=0;
+    Altimetry.sig0Avg=0;Altimetry.pkAvg=0;
+
+else
+
+
 for j=1:length(Altimetry.ci),
     
     ic=Altimetry.c==Altimetry.ci(j);
@@ -24,7 +32,7 @@ for j=1:length(Altimetry.ci),
             ERRORCODE=-9999; %no data in the GDR
             Altimetry.NDcyc=[Altimetry.NDcyc 2];        
         else
-            ERRORCODE=-9998; %all records filtered out
+            ERRORCODE=-9998; %all records filtered out from height/ice filter
             Altimetry.NDcyc=[Altimetry.NDcyc 0];        %need to work on this more
         end
         Altimetry.hbar(j)=ERRORCODE;
@@ -69,4 +77,5 @@ if ShowPlots,
     title({line1,line2})
     
     legend('Average','\sigma_0 Weighted Average','Location','Best')
+end
 end

@@ -1,40 +1,67 @@
-%this version handles separate Excel sheet and shapefile. The next
-%iteration should require that all data currently stored in the Excel sheet
-%be added into the shapefile database.
+
 
 clear all; close all
 % uselib('altimetry')
-folderpath='/Users/MTD/Library/Matlab/Altimetry/AltimetryToolbox';  %this is the path to the toolbox
-
-addpath(genpath(folderpath)); %this is the path to the toolbox + data
-[VS S] = ReadPotentialVirtualStations('Yukon_Jason2');
-FilterData = ReadFilterFile('yukonheights.txt');
-IceData= ReadIceFile('icebreak_pilot');
-USGS=USGSread('Pil_Sta.txt');
-Ncyc=219; %not sure best way to set this; maybe manually
-
-%this part should eventually get included in the shapefile, and we'll do
-%away with the excel file
-for i=1:length(VS),
-    VS(i).Satellite='Jason-2';
-    VS(i).Rate=20; %Hz
-    VS(i).X=S(i).X;
-    VS(i).Y=S(i).Y;
+datapath='C:\Users\Tuozzolo.1\Documents\MATLAB\measures\Process_Data\Columbia_Jason2';
+library='C:\Users\Tuozzolo.1\Documents\MATLAB\measures\Process_Data\Altimetry_Toolbox_GitHub\Altimetry_Toolbox';
+addpath(genpath(datapath))%this is the path to the raw data (GDR outputs + shapefiles + misc data)
+addpath(genpath(library)) %this is the path to the altimetry toolbox
+rivername='Columbia'; satellite='Jason2'; stations=0; DoIce=false;
+%set river name, satellite name, # of stations to read (if 0, it reads
+%all), whether or not to filter according to ice.
+%%
+[VS, Ncyc,S] = ReadPotentialVirtualStations(rivername,satellite); %get VS data from shapefile
+if stations==0; stations=length(VS); end %run all stations unless otherwise specified
+%%
+DEM=zeros(stations,3);
+for i=1:stations
+    [VS(i).AltDat, DEM(VS(i).Id+1,:)]= GetAltimetry(VS(i),Ncyc); %get all raw data, place in VS structure
 end
 
-% for i=1:length(VS),
-DoPlotsFilt=false; ShowBad=true; DoPlotsAvg=true; DoIce=true;
-for i=1:length(VS),
-    VS(i).AltDat = GetAltimetry(VS(i),Ncyc); 
-    VS(i).AltDat = HeightFilter(VS(i).AltDat,FilterData(VS(i).Id+1),IceData,DoIce,DoPlotsFilt,ShowBad);
+figure; plot(DEM(:,3),'b--'); hold on;  plot(DEM(:,1),'r-'); %show DEM data with virtual stations
+%%
+for i=1:stations
+    FilterData(i).ID=VS(i).Id;
+    if DEM(1,i)>0
+        FilterData(i).AbsHeight=DEM(1,VS(i).Id+1);
+    else if DEM(3,i)>0
+            FilterData(i).AbsHeight=DEM(3,VS(i).Id+1);
+        else if DEM(2,i)>0
+                FilterData(i).AbsHeight=0;%DEM(VS(i).Id+1,2);
+            else
+                FilterData(i).AbsHeight=0;
+            end
+        end
+    end
+    FilterData(i).MaxFlood=15;
+    FilterData(i).MinFlood=10;
+end
+%%
+if DoIce
+    icefile = 'icebreak_pilot';
+    IceData = ReadIceFile(icefile); %read in ice file for freeze/thaw dates
+else
+    IceData=[];
+end
+%%
+DoPlotsFilt=true; ShowBad=true; DoPlotsIce=false; DoPlotsAvg=true;
+for i=1:stations,
+    [VS(i).AltDat] = HeightFilter(VS(i).AltDat,FilterData(i),IceData,DoIce,VS(i).ID,DoPlotsFilt,ShowBad);
     VS(i).AltDat = CalcAvgHeights(VS(i).AltDat,VS(i).ID,DoPlotsAvg);
-    WriteAltimetryData(VS(i),FilterData(i));
+    %WriteAltimetryData(VS(i),FilterData(i),IceData);
 end
 
-sta=6;
-USGS=USGS_Compare(VS(sta).ID,VS(sta).AltDat,USGS);
-USGSwrite(USGS,VS(sta).ID);
+
+figure;
+for i=1:stations
+    scatter(VS(i).AltDat.lon,VS(i).AltDat.lat,10,VS(i).AltDat.sig0); hold on; plot(S(i).X+360,S(i).Y,'g');
+end
 
 
-ncdisp('DataProduct/yukon_J2_0.nc') %example
-ncdisp('USGS.nc'); %other example
+% sta=6;
+% USGS=USGS_Compare(VS(sta).ID,VS(sta).AltDat,USGS);
+% USGSwrite(USGS,VS(sta).ID);
+% 
+% 
+% ncdisp('DataProduct/yukon_J2_0.nc') %example
+% ncdisp('USGS.nc'); %other example
