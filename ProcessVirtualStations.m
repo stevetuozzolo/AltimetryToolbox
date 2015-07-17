@@ -48,7 +48,7 @@ DoPlotsFilt=true; ShowBad=true; DoPlotsIce=false; DoPlotsAvg=true;
 for i=1:stations,
     [VS(i).AltDat] = HeightFilter(VS(i).AltDat,FilterData(i),IceData,DoIce,VS(i).ID,DoPlotsFilt,ShowBad);
     VS(i).AltDat = CalcAvgHeights(VS(i).AltDat,VS(i).ID,DoPlotsAvg);
-    %WriteAltimetryData(VS(i),FilterData(i),IceData);
+    WriteAltimetryData(VS(i),FilterData(i),IceData);
 end
 
 
@@ -63,5 +63,5 @@ end
 % USGSwrite(USGS,VS(sta).ID);
 % 
 % 
-% ncdisp('DataProduct/yukon_J2_0.nc') %example
-% ncdisp('USGS.nc'); %other example
+ncdisp(['DataProduct/' rivername '_' satellite '_0' '.nc']) %example
+%ncdisp('USGS.nc'); %other example
