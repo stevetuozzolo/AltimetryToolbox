@@ -13,7 +13,7 @@ Altimetry.NDflag=[];
 if sum(Altimetry.GDRMissing)==length(Altimetry.GDRMissing)
     
     Altimetry.hbar=0;Altimetry.hstd=0;Altimetry.N=0;Altimetry.hwbar=0;
-    Altimetry.sig0Avg=0;Altimetry.pkAvg=0;
+    Altimetry.sig0Avg=0;Altimetry.pkAvg=0; Altimetry.Write=0;
 
 else
 
@@ -78,4 +78,11 @@ if ShowPlots,
     
     legend('Average','\sigma_0 Weighted Average','Location','Best')
 end
+
+if Altimetry.nGood/Altimetry.cmax<=0.33
+    Altimetry.Write=0;
+else
+    Altimetry.Write=1;
+end
+    
 end

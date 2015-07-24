@@ -1,4 +1,4 @@
-function [VS Ncyc S] = ReadPotentialVirtualStations(fname,satellite)
+function [VS,Ncyc,S] = ReadPotentialVirtualStations(fname,satellite)
 fname=[fname '_' satellite];
 S=shaperead(fname);
 
