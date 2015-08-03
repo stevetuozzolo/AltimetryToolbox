@@ -23,8 +23,8 @@ Altimetry.iGoodH=Altimetry.h>=FilterData.AbsHeight-FilterData.MinFlood &...
 iH2=Altimetry.h>=prctile(Altimetry.h(Altimetry.iGoodH),5)-2; %filter relative to baseflow (>-2m 5th %tile flow)
 
 Altimetry.iGoodH=Altimetry.iGoodH&iH2; %combine height filters
-ih3=Altimetry.sig0>20;
-Altimetry.iGoodH=Altimetry.iGoodH&ih3;
+%ih3=Altimetry.sig0>20;
+%Altimetry.iGoodH=Altimetry.iGoodH&ih3;
 Altimetry.fFilter=(sum(~Altimetry.iGoodH))/length(Altimetry.h); %determine fraction of retrieved data filtered out
 
 %% 

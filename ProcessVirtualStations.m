@@ -4,7 +4,7 @@ datapath='C:\Users\Tuozzolo.1\Documents\MATLAB\measures\Process_Data';
 library='C:\Users\Tuozzolo.1\Documents\MATLAB\measures\Process_Data\Altimetry_Toolbox_GitHub\Altimetry_Toolbox';
 addpath(genpath(datapath))%this is the path to the raw data (GDR outputs + shapefiles + misc data)
 addpath(genpath(library)) %this is the path to the altimetry toolbox
-rivername='Mackenzie'; satellite='Envisat'; stations=0; DoIce=true;
+rivername='Orinoco'; satellite='Envisat'; stations=0; DoIce=false;
 %set river name, satellite name, # of stations to read (if 0, it reads
 %all), whether or not to filter according to ice.
 %%
@@ -34,8 +34,8 @@ for i=stations
             end
         end
     end
-    FilterData(i).MaxFlood=15;
-    FilterData(i).MinFlood=10;
+    FilterData(i).MaxFlood=150;
+    FilterData(i).MinFlood=100;
 end
 %%
 if DoIce
@@ -46,6 +46,7 @@ else
 end
 %%
 DoPlotsFilt=false; ShowBad=true; DoPlotsIce=false; DoPlotsAvg=true;
+stations=23:29;
 for i=stations,
     [VS(i).AltDat] = HeightFilter(VS(i).AltDat,FilterData(i),IceData,DoIce,VS(i).ID,DoPlotsFilt,ShowBad);
     VS(i).AltDat = CalcAvgHeights(VS(i).AltDat,VS(i).ID,DoPlotsAvg);
@@ -53,6 +54,9 @@ for i=stations,
     %WriteAltimetryData(VS(i),FilterData(i),IceData);
     end
 end
+
+
+
 
 %%
 for i=stations
