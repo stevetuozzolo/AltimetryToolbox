@@ -69,8 +69,9 @@ end
 
 for i=1:length(CurrRegion)
     figure;
-    semilogy(J2(i).Width,J2(i).Val,'r*'); hold on;
-    semilogy(Env(i).Width,Env(i).Val,'r*'); hold off;
+    semilogx(J2(i).Width,J2(i).Val,'r*'); hold on;
+    semilogx(Env(i).Width,Env(i).Val,'r*'); hold off;
 end
+
 %%
     [J2mat,Envmat,j2prop,envprop]=doRivStats(J2,Env);

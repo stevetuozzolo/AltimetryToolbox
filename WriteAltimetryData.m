@@ -41,6 +41,7 @@ vIDs.pass=netcdf.defVar(ncid,'pass','NC_INT',[]);
 SceneDimId = netcdf.defDim(sGroupID,'scene',netcdf.getConstant('NC_UNLIMITED'));
 XDimId = netcdf.defDim(sGroupID,'lonbox',length(VS.X)-1);
 YDimId = netcdf.defDim(sGroupID,'latbox',length(VS.Y)-1);
+IceDimId= netcdf.defDim(sGroupID,'icedat',size(Ice,1));
 cDimId = netcdf.defDim(sGroupID,'coordinates',5);
 %2.3.2 definitions
 vIDs.LandsatSceneID=netcdf.defVar(sGroupID,'scene','NC_CHAR',SceneDimId);
@@ -73,13 +74,13 @@ vIDs.pkAvg=netcdf.defVar(tGroupID,'pkbar','NC_DOUBLE',tdimid);
 
 
 %2.6 filter
-yDimId = netcdf.defDim(fGroupID,'years',8);
+IceDimId = netcdf.defDim(fGroupID,'years',size(Ice,1));
 vIDs.nND=netcdf.defVar(fGroupID,'nNODATA','NC_INT',[]);
 vIDs.riverh=netcdf.defVar(fGroupID,'riverh','NC_DOUBLE',[]);
 vIDs.maxh=netcdf.defVar(fGroupID,'maxh','NC_DOUBLE',[]);
 vIDs.minh=netcdf.defVar(fGroupID,'minh','NC_DOUBLE',[]);
-vIDs.icethaw=netcdf.defVar(fGroupID,'icethaw','NC_DOUBLE',yDimId);
-vIDs.icefreeze=netcdf.defVar(fGroupID,'icefreeze','NC_DOUBLE',yDimId);
+vIDs.icethaw=netcdf.defVar(fGroupID,'icethaw','NC_DOUBLE',IceDimId);
+vIDs.icefreeze=netcdf.defVar(fGroupID,'icefreeze','NC_DOUBLE',IceDimId);
 
 %% 3  attributes
 %3.1 global
@@ -187,7 +188,7 @@ netcdf.putVar(fGroupID,vIDs.maxh,Filter.AbsHeight+Filter.MaxFlood);
 netcdf.putVar(fGroupID,vIDs.minh,Filter.AbsHeight-Filter.MinFlood);
 
 %4.6 ice
-if size(Ice,2)>2
+if size(Ice,1)>2
 netcdf.putVar(fGroupID,vIDs.icethaw,Ice(:,2));
 netcdf.putVar(fGroupID,vIDs.icefreeze,Ice(:,3));
 end

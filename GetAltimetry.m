@@ -45,16 +45,18 @@ else if all(fgetl(fid)~= -1)
         end
         
         %% read DEM data
-        delimiter = {' ','  ','   '};
+        delimiter = {' ','  ','   ','    '};
         endRow = 3;
         %  formatSpec='%*[#]%d%*f%*f';
         formatSpec = '%*s%f%f%f%*s%*s%*s%*s%*s%*s%*s%*s%*s%[^\n\r]';
-        
+        %formatSpec = '%*3s%10s%*15s%*[^\n\r]';
         fid=fopen(fname);
         Altimetry.demDat=textscan(fid,formatSpec, endRow, 'Delimiter',delimiter, ...
             'EmptyValue',NaN,'ReturnOnError', false);
         fclose(fid);
         DEM=Altimetry.demDat{1}';
+        Altimetry.AvgGradient=Altimetry.demDat{2}';
+        Altimetry.RMSGradient=Altimetry.demDat{3}';
     else
         GDat=-1;
         Altimetry.c=[];
