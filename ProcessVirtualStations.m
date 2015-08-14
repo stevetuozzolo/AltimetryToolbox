@@ -5,18 +5,18 @@ NorthAmerica={'Columbia','Mackenzie','StLawrence','Susquehanna', 'Yukon','Missis
 SouthAmerica={'Amazon','Tocantins','Orinoco','SaoFrancisco','Uruguay','Magdalena','Parana','Oiapoque','Essequibo','Courantyne'};
 CurrRiv={'Courantyne'}; %if you want to do a single river, use this
 Americas=[NorthAmerica SouthAmerica];
-CurrRegion=Americas; %you can switch this to CurrRiv if you only want to run one river.
+RunRiv=Americas; %you can switch this to CurrRiv if you only want to run one river.
 Satellite={'Jason2','Envisat'};
-for iriv=1:length(CurrRegion)
-    clearvars -except CurrRegion Satellite iriv jsat J2 Env;
-    for jsat=1:2
+for iriv=1:length(RunRiv)
+    clearvars -except RunRiv Satellite iriv jsat J2 Env;
+    for jsat=2:2
         %% uselib('altimetry')
         %set the datapath and input values for river data analysis
         datapath='C:\Users\Tuozzolo.1\Documents\MATLAB\measures\Process_Data';
         library='C:\Users\Tuozzolo.1\Documents\MATLAB\measures\Process_Data\Altimetry_Toolbox_GitHub\Altimetry_Toolbox';
         addpath(genpath(datapath))%this is the path to the raw data (GDR outputs + shapefiles + misc data)
         addpath(genpath(library)) %this is the path to the altimetry toolbox
-        rivername=CurrRegion{iriv}; satellite=Satellite{jsat}; stations=0;
+        rivername=RunRiv{iriv}; satellite=Satellite{jsat}; stations=0;
         if strcmp(rivername,'Yukon') || strcmp(rivername,'Mackenzie')
             DoIce=true;
         else
@@ -60,17 +60,25 @@ for iriv=1:length(CurrRegion)
         end
         %% Generate overall statistics for river
         if jsat==1 %put in the jason 2 category
-            J2(iriv)=genRivStats(VS,rivername,stations,iriv,CurrRegion);
+            J2(iriv)=genRivStats(VS,rivername,stations,iriv,RunRiv);
         else %put in the envisat category
-            Env(iriv)=genRivStats(VS,rivername,stations,iriv,CurrRegion);
+            Env(iriv)=genRivStats(VS,rivername,stations,iriv,RunRiv);
         end
     end
 end
 
-for i=1:length(CurrRegion)
+totmat=zeros(1,2);
+for i=1:length(RunRiv)
     figure;
-    semilogy(J2(i).Width,J2(i).Val,'r*'); hold on;
-    semilogy(Env(i).Width,Env(i).Val,'r*'); hold off;
+    plot(J2(i).Width,J2(i).Val,'r*'); hold on;
+    plot(Env(i).Width,Env(i).Val,'r*'); hold off;
+    totmat=[totmat; J2(i).Width' J2(i).Val'; Env(i).Width' Env(i).Val'];
 end
+%hold off; figure; plot(totmat(:,1),totmat(:,2),'r.','MarkerSize',15); hold on
+%xlabel('River width')
+%title('Virtual Stations with >50% coverage vs. river width')
+%ylabel('Fraction of passes with good data')
+%    print('-dpng','-r400',['AmericasWidth'])
+
 %%
-    [J2mat,Envmat,j2prop,envprop]=doRivStats(J2,Env);
+  %  [J2mat,Envmat,j2prop,envprop]=doRivStats(J2,Env);
