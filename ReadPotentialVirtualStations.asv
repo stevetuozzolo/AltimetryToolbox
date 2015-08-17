@@ -1,11 +1,7 @@
 function [VS,Ncyc,S,stations] = ReadPotentialVirtualStations(fname,satellite,stations)
 fname=[fname '_' satellite];
 
-if satellite(1)=='E'
-filecheck=fopen([fname '_0_18hz']);
-else
-    filecheck=fopen([fname '_0_20hz']);
-end
+filecheck=fopen([fname '_0']);
 if filecheck==-1
     VS=[];
     Ncyc=[];
