@@ -4,7 +4,7 @@ function [J2mat,Envmat,j2prop,envprop]= doRivStats(J2,Env)
 counter=0;
 allcount=0;
 for i=1:length(J2)
-tcount=sum((J2(i).Val>.5));
+tcount=sum((J2(i).Val>.7));
     counter=counter+tcount;
     tallct=sum(length(J2(i).Val));
 allcount=allcount+tallct;
@@ -20,7 +20,7 @@ end
 counter=0;
 allcount=0;
 for i=1:length(Env)
-tcount=sum((Env(i).Val>.5));
+tcount=sum((Env(i).Val>.7));
     counter=counter+tcount;
     tallct=sum(length(Env(i).Val));
 allcount=allcount+tallct;

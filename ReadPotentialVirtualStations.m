@@ -21,7 +21,7 @@ else
         VS(i).Pass=S(i).Pass_Num;
         ID=strsplit(VS(i).ID,'_');
         VS(i).Id=str2num(cell2mat(ID(3)));
-        
+        VS(i).LSID=S(i).Landsat_ID;
         VS(i).Satellite=satellite;
         VS(i).X=S(i).X;
         VS(i).Y=S(i).Y;

@@ -5,10 +5,9 @@ for i=1:length(RunRiv)-2
     figure;
     plot(J2(i).Width,J2(i).Val,'r*'); hold on;
     plot(Env(i).Width,Env(i).Val,'r*'); hold off;
-    J2(i).Width
-    J2(i).ID
-    Env(i).Width
-    Env(i).ID
+    title([RunRiv(i) ' Width vs Val'])
+    xlabel('Width,m')
+    ylabel('% of stations w/ >50% coverage')
     totmat=[totmat; J2(i).Width' J2(i).Val'; Env(i).Width' Env(i).Val'];
 end
 hold off; figure; plot(totmat(:,1),totmat(:,2),'r.','MarkerSize',15); hold on

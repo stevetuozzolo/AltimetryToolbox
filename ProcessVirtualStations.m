@@ -6,14 +6,14 @@ clear all; close all; clc;
 %% Create a list of rivers you want to run
 NorthAmerica={'Columbia','Mackenzie','StLawrence','Susquehanna', 'Yukon','Mississippi'};
 SouthAmerica={'Amazon','Tocantins','Orinoco','SaoFrancisco','Uruguay','Magdalena','Parana','Oiapoque','Essequibo','Courantyne'};
-CurrRiv={'Amazon'}; %if you want to do a single river, use this
+CurrRiv={'StLawrence'}; %if you want to do a single river, use this
 Americas=[NorthAmerica SouthAmerica];
 RunRiv=Americas; %you can switch this to CurrRiv if you only want to run one river.
-Satellite={'Jason2','Envisat'};
+Satellite={'Jason2','Envisat'}; %either Envi or Jason2 or both, need a cell with 1 or more strings
 
 for iriv=1:length(RunRiv)
     clearvars -except RunRiv Satellite iriv jsat J2 Env; %keep these on each loop. get rid of each river's data when moving to the next river
-    for jsat=1:2
+    for jsat=1:length(Satellite)
         %% uselib('altimetry')
         %set the datapath and input values for river data analysis
         datapath='C:\Users\Tuozzolo.1\Documents\MATLAB\measures\Process_Data';
@@ -49,18 +49,19 @@ for iriv=1:length(RunRiv)
                 [VS(i).AltDat] = HeightFilter(VS(i).AltDat,S(i),FilterData(i),IceData,DoIce,VS(i).ID,DoPlotsFilt,ShowBad);
                 VS(i).AltDat = CalcAvgHeights(VS(i).AltDat,VS(i).ID,DoPlotsAvg);
                 if VS(i).AltDat.Write && DoNetCDF
-                    WriteAltimetryData(VS(i),FilterData(i),IceData);
+                   WriteAltimetryData(VS(i),FilterData(i),IceData);
                 end
             end
             %% Generate overall statistics for river
             if jsat==1 && size(VS,1)>0 %put in the jason 2 category
                 J2(iriv)=genRivStats(VS,rivername,stations,iriv,RunRiv);
             else if size(VS,1)>0 %put in the envisat category
-                Env(iriv)=genRivStats(VS,rivername,stations,iriv,RunRiv);
+                    Env(iriv)=genRivStats(VS,rivername,stations,iriv,RunRiv);
                 end
             end
         end
     end
+    %pause;
 end
-    %% 
+%%
 DoMetaPlots(RunRiv,J2,Env);

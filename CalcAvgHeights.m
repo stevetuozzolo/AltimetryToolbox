@@ -62,21 +62,24 @@ end
 Altimetry.nGood=sum(Altimetry.hbar~=-9999 & Altimetry.hbar~=-9998);
 
 if ShowPlots,
-    figure
+    sp3=subplot(2,1,2); 
+    hold on;
     hplotAvg=Altimetry.hbar;
     hplotAvg(Altimetry.hbar==-9998 | Altimetry.hbar==-9999)=NaN;
-    plot(Altimetry.t,hplotAvg,'o-'); hold on;
+    plot(sp3,Altimetry.t,hplotAvg,'o-'); hold on;
     hplotWavg=Altimetry.hwbar;
     hplotWavg(Altimetry.hwbar==-9998 | Altimetry.hwbar==-9999)=NaN;
-    plot(Altimetry.t,hplotWavg,'x-'); hold off;
+    plot(sp3,Altimetry.t,hplotWavg,'x-'); hold off;
     
-    set(gca,'FontSize',14)
-    datetick
+    set(sp3,'FontSize',14)
+    datetick(sp3,'keeplimits')
     line1=['Station #' strrep(ID,'_','-')];
     line2=['Produced ' num2str(Altimetry.nGood) '/' num2str(Altimetry.cmax)];
-    title({line1,line2})
+    title(sp3,{line1,line2})
     
-    legend('Average','\sigma_0 Weighted Average','Location','Best')
+    legend(sp3,'Average','\sigma_0 Weighted Average','Location','Best')
+  %   print('-dpng','-r400',[ID])
+%close all;
 end
 
 if Altimetry.nGood/Altimetry.cmax<=0.33
@@ -84,5 +87,5 @@ if Altimetry.nGood/Altimetry.cmax<=0.33
 else
     Altimetry.Write=1;
 end
-    
+hold off;    
 end

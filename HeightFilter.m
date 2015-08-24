@@ -68,16 +68,13 @@ if DoPlots
     ylim([FilterData.AbsHeight-100 FilterData.AbsHeight+100]);
     xlim([Altimetry.tAll(1) Altimetry.tAll(length(Altimetry.tAll))]);
     datetick(sp1,'keeplimits')
-    hold off;
     
-    sp2=subplot(2,1,2);
-    scatter(Altimetry.lon-360,Altimetry.lat,10,Altimetry.h); hold on;
-    c=colorbar;
-    c.Label.String = 'height'; 
-    plot(S.X,S.Y,'g');% hold off; 
-    print('-dpng','-r400',[ID])
-close all;
-hold off;
+%     sp2=subplot(3,1,2);
+%     scatter(Altimetry.lon-360,Altimetry.lat,10,Altimetry.h); hold on;
+%     c=colorbar;
+%     c.Label.String = 'height'; 
+%     plot(S.X,S.Y,'g');% hold off; 
+%close all;
 end
 
 return
