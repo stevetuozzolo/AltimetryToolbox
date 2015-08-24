@@ -2,15 +2,18 @@
 by Stephen Tuozzolo.
 
 --- Background ------------------------------------------------------------
+
 The toolbox functions as a data-processing tool for the MEASURES project. It takes raw altimetric height data extracted by the GDR and runs it through a filter before storing it in a NETCDF file.
 
 
 --- ProcessVirtualStations.m ----------------------------------------------
+
 This is the main program. It takes a river and satellite (or multiple rivers and satellites), finds the raw data files, processes them, and outputs them as NETCDF files.
 
 Input arguments are RunRiv (must be a cell, can be one or multiple rivers) and Satellite (currently set to Jason2 & Envisat data)
 
  ... Things to note .......................................................
+ 
 1. The option to use the IceFilter is currently hardwired. The IceFilter currently only turns on for the Mackenzie and Yukon Rivers.
 2. The code is currently set up to run multiple rivers and virtual stations at one time. this can be changed by removing the two highest-level loops and with some other slight alterations. the other option is to set RunRiv to your preferred river, and change the indices that jsat runs through (jsat=1 is Jason2, jsat=2 is Envisat)
 
