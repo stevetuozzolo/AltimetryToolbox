@@ -1,4 +1,4 @@
-function WriteAltimetryData(VS,Filter)
+function WriteAltimetryData(VS,Filter,Ice)
 
 %level 2: these are the level 2 data from the platforms... not archived here
 %level 3: these are the actual elevations being output by Chan's scripts,
@@ -39,11 +39,14 @@ vIDs.pass=netcdf.defVar(ncid,'pass','NC_INT',[]);
 %2.3 sampling 
 %2.3.1 dimensions
 SceneDimId = netcdf.defDim(sGroupID,'scene',netcdf.getConstant('NC_UNLIMITED'));
+XDimId = netcdf.defDim(sGroupID,'lonbox',length(VS.X)-1);
+YDimId = netcdf.defDim(sGroupID,'latbox',length(VS.Y)-1);
+IceDimId= netcdf.defDim(sGroupID,'icedat',size(Ice,1));
 cDimId = netcdf.defDim(sGroupID,'coordinates',5);
 %2.3.2 definitions
 vIDs.LandsatSceneID=netcdf.defVar(sGroupID,'scene','NC_CHAR',SceneDimId);
-vIDs.SampX=netcdf.defVar(sGroupID,'lonbox','NC_DOUBLE',cDimId);
-vIDs.SampY=netcdf.defVar(sGroupID,'latbox','NC_DOUBLE',cDimId);
+vIDs.SampX=netcdf.defVar(sGroupID,'lonbox','NC_DOUBLE',XDimId);
+vIDs.SampY=netcdf.defVar(sGroupID,'latbox','NC_DOUBLE',YDimId);
 vIDs.Island=netcdf.defVar(sGroupID,'island','NC_INT',[]);
 
 %2.4 level 3
@@ -71,13 +74,13 @@ vIDs.pkAvg=netcdf.defVar(tGroupID,'pkbar','NC_DOUBLE',tdimid);
 
 
 %2.6 filter
-yDimId = netcdf.defDim(fGroupID,'years',8);
+IceDimId = netcdf.defDim(fGroupID,'years',size(Ice,1));
 vIDs.nND=netcdf.defVar(fGroupID,'nNODATA','NC_INT',[]);
 vIDs.riverh=netcdf.defVar(fGroupID,'riverh','NC_DOUBLE',[]);
 vIDs.maxh=netcdf.defVar(fGroupID,'maxh','NC_DOUBLE',[]);
 vIDs.minh=netcdf.defVar(fGroupID,'minh','NC_DOUBLE',[]);
-vIDs.icethaw=netcdf.defVar(fGroupID,'icethaw','NC_DOUBLE',yDimId);
-vIDs.icefreeze=netcdf.defVar(fGroupID,'icefreeze','NC_DOUBLE',yDimId);
+vIDs.icethaw=netcdf.defVar(fGroupID,'icethaw','NC_DOUBLE',IceDimId);
+vIDs.icefreeze=netcdf.defVar(fGroupID,'icefreeze','NC_DOUBLE',IceDimId);
 
 %% 3  attributes
 %3.1 global
@@ -134,8 +137,11 @@ netcdf.putAtt(fGroupID,vIDs.nND,'long_name','Number of Cycles without Data');
 netcdf.putAtt(fGroupID,vIDs.riverh,'long_name','River elevation from filter file');
 netcdf.putAtt(fGroupID,vIDs.maxh,'long_name','Maximum elevation allowed by filter');
 netcdf.putAtt(fGroupID,vIDs.minh,'long_name','Minimum elevation allowed by filter');
+
+%3.7 ice
 netcdf.putAtt(fGroupID,vIDs.icethaw,'long_name','Thaw dates for river');
 netcdf.putAtt(fGroupID,vIDs.icefreeze,'long_name','Freeze dates for river');
+
 
 netcdf.endDef(ncid);
 
@@ -180,9 +186,12 @@ netcdf.putVar(fGroupID,vIDs.nND,VS.AltDat.nNODATA);
 netcdf.putVar(fGroupID,vIDs.riverh,Filter.AbsHeight);
 netcdf.putVar(fGroupID,vIDs.maxh,Filter.AbsHeight+Filter.MaxFlood);
 netcdf.putVar(fGroupID,vIDs.minh,Filter.AbsHeight-Filter.MinFlood);
+
+%4.6 ice
+if size(Ice,1)>2
 netcdf.putVar(fGroupID,vIDs.icethaw,Ice(:,2));
 netcdf.putVar(fGroupID,vIDs.icefreeze,Ice(:,3));
-
+end
 
 % close 
 netcdf.close(ncid);
